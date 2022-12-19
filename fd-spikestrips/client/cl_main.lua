@@ -23,12 +23,12 @@ RegisterNetEvent('fd-spikestrips:client:SpawnSpikeStrip', function()
    if not IsPedInAnyVehicle(PlayerPedId()) then
     if Config.AllowSpikesOnlyForPolice then 
      if PlayerData.job.name == "police" then
-      TriggerEvent('fd-spawnstrips:client:spawnSpike')
+        TriggerServerEvent('fd-spikestrips:server:removeItem')
      else 
       QBCore.Functions.Notify("Only police can use these!", 'error')
      end
      elseif not Config.AllowSpikesOnlyForPolice then 
-      TriggerEvent('fd-spawnstrips:client:spawnSpike') 
+        TriggerServerEvent('fd-spikestrips:server:removeItem')
      end
     else 
      QBCore.Functions.Notify("You can't place a spikestrip inside a vehicle!", 'error')
@@ -39,10 +39,7 @@ RegisterNetEvent('fd-spikestrips:client:SpawnSpikeStrip', function()
 end)
 
 RegisterNetEvent('fd-spawnstrips:client:spawnSpike', function()
-
     -- Spawn
-    TriggerEvent('inventory:client:ItemBox', QBCore.Shared.Items["spikestrip"], "remove")
-    TriggerServerEvent("QBCore:Server:RemoveItem", "spikestrip", 1) 
     openAnim()
     local spawnCoords = GetOffsetFromEntityInWorldCoords(PlayerPedId(), 0.0, 2.0, 0.0)
     local spike = CreateObject(spikemodel, spawnCoords.x, spawnCoords.y, spawnCoords.z, 1, 1, 1)
@@ -123,7 +120,7 @@ CreateThread(function()
 
                     if distance < 1.8 then
                         if not IsVehicleTyreBurst(vehicle, tires[a].index, true) or IsVehicleTyreBurst(vehicle, tires[a].index, false) then
-                            SetVehicleTyreBurst(vehicle, tires[a].index, 1, 1000.0)
+                            SetVehicleTyreBurst(vehicle, tires[a].index, Config.InstantlyPop, 1000.0)
                         end
                     end
                 end
