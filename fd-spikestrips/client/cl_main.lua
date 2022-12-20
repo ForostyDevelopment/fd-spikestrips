@@ -57,6 +57,7 @@ RegisterNetEvent('fd-spawnstrips:client:spawnSpike', function()
     QBCore.Functions.Notify('You have placed down a spike strip', 'success')
     
     -- Delete
+   if not Config.UseTarget then 
     Wait(Config.DeleteTime * 1000)
     NetworkRegisterEntityAsNetworked(SpawnedSpikes[ClosestSpike].object)
     NetworkRequestControlOfEntity(SpawnedSpikes[ClosestSpike].object)
@@ -65,7 +66,26 @@ RegisterNetEvent('fd-spawnstrips:client:spawnSpike', function()
     SpawnedSpikes[ClosestSpike] = nil
     ClosestSpike = nil
     TriggerServerEvent('fd-spikestrips:server:SyncSpikes', SpawnedSpikes)
-    
+   else 
+    exports['qb-target']:AddTargetEntity(spike, {
+        options = { 
+            { 
+                icon = "fa-solid fa-trash",
+                label = 'Remove spike', 
+                action = function() 
+                 NetworkRegisterEntityAsNetworked(SpawnedSpikes[ClosestSpike].object)
+                 NetworkRequestControlOfEntity(SpawnedSpikes[ClosestSpike].object)
+                 SetEntityAsMissionEntity(SpawnedSpikes[ClosestSpike].object)
+                 DeleteEntity(SpawnedSpikes[ClosestSpike].object)
+                 SpawnedSpikes[ClosestSpike] = nil
+                 ClosestSpike = nil
+                 TriggerServerEvent('fd-spikestrips:server:SyncSpikes', SpawnedSpikes)
+                end,
+            }
+        },
+        distance = 2.5,
+    })
+ end
 end)
 
 RegisterNetEvent('fd-spikestrips:client:SyncSpikes', function(table)
